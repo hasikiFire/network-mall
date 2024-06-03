@@ -24,7 +24,7 @@ CREATE TABLE `user` (
 CREATE TABLE `roles` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT NOT NULL UNIQUE COMMENT '用户ID',
-  `role_name` varchar(16) NOT NULL COMMENT 'admin:管理员，user（普通用户）',
+  `role_name` varchar(16) NOT NULL COMMENT 'admin:管理员，user（普通用户）'
 );
 
 CREATE TABLE package (
