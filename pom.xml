@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.5</version>
+		<version>3.0.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hasikiFire</groupId>
@@ -16,11 +16,11 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
-		<mybatis-plus.version>3.5.3</mybatis-plus.version>
+		<mybatis-plus.version>3.5.5</mybatis-plus.version>
 		<mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
 		<jjwt.version>0.11.5</jjwt.version>
-		<xxl-job.version>2.3.1</xxl-job.version>
-		<redisson.version>3.19.1</redisson.version>
+		<!-- <xxl-job.version>2.3.1</xxl-job.version> -->
+		<!-- <redisson.version>3.19.1</redisson.version> -->
 		<spring-boot-admin.version>3.0.0-M1</spring-boot-admin.version>
 		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
 	</properties>
@@ -42,6 +42,7 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc-openapi.version}</version>
 		</dependency>
+
 		<!-- Spring Boot 管理和监控 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -85,11 +86,11 @@
 			<scope>runtime</scope>
 		</dependency>
 		<!-- Redisson 相关 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson-spring-boot-starter</artifactId>
 			<version>${redisson.version}</version>
-		</dependency>
+		</dependency> -->
 		<!-- 邮件 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -106,18 +107,23 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- MQ 相关 -->
+		<!-- 请求参数校验相关 -->
 		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		<!-- MQ 相关 -->
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<!-- XXL-JOB 相关 -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.xuxueli</groupId>
 			<artifactId>xxl-job-core</artifactId>
 			<version>${xxl-job.version}</version>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 
 	<build>
