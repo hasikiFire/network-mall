@@ -7,15 +7,14 @@ import lombok.Data;
 /**
  * 用户注册 响应DTO
  * 
- * @author xiongxiaoyang
- * @date 2022/5/17
+ * @author hasikiFire
  */
 @Data
 @Builder
 public class UserRegisterRespDto {
 
     @Schema(description = "用户ID")
-    private Long uid;
+    private Integer uid;
 
     @Schema(description = "用户token")
     private String token;

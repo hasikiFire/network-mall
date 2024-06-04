@@ -14,8 +14,7 @@ import lombok.Getter;
  * <p>
  * 错误码分为一级宏观错误码、二级宏观错误码、三级宏观错误码。 在无法更加具体确定的错误场景中，可以直接使用一级宏观错误码。
  *
- * @author xiongxiaoyang
- * @date 2022/5/11
+ * @author hasikiFire
  */
 @Getter
 @AllArgsConstructor
@@ -50,6 +49,11 @@ public enum ErrorCodeEnum {
      * 用户验证码错误
      */
     USER_VERIFY_CODE_ERROR("A0240", "用户验证码错误"),
+
+    /**
+     * 邮箱已存在
+     */
+    EMAIL_EXIST("A0112", "邮箱已存在"),
 
     /**
      * 用户名已存在

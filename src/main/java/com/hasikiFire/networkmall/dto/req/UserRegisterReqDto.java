@@ -9,20 +9,26 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 用户注册 请求DTO
  *
- * @author xiongxiaoyang
- * @date 2022/5/16
+ * @author hasikiFire
  */
 @Data
 public class UserRegisterReqDto {
 
-    @Schema(description = "手机号", required = true)
-    @NotBlank(message = "手机号不能为空！")
-    @Pattern(regexp = "^1[3|4|5|6|7|8|9][0-9]{9}$", message = "手机号格式不正确！")
-    private String username;
+    @Schema(description = "邮箱", required = true)
+    @NotBlank(message = "邮箱不能为空！")
+    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+).com$", message = "邮箱格式不正确！")
+    private String email;
+
+    @Schema(description = "昵称", required = true)
+    @NotBlank(message = "昵称不能为空！")
+    private String name;
 
     @Schema(description = "密码", required = true)
     @NotBlank(message = "密码不能为空！")
     private String password;
+
+    @Schema(description = "邀请码", required = false)
+    private String inviteCode;
 
     @Schema(description = "验证码", required = true)
     @NotBlank(message = "验证码不能为空！")

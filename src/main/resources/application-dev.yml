@@ -2,45 +2,12 @@ spring:
   application:
     # 应用名
     name: network-mall
-  profiles:
-    active: dev
-
-  data:
-    # Redis 配置
-    redis:
-      host: 127.0.0.1
-      port: 6379
-      password:
---- #---------------------自定义配置----------------------------
-network:
-  # 跨域配置
-  # cors:
-  #   # 允许跨域的域名
-  #   allow-origins:
-  #     - http://localhost:1024
-  #     - http://localhost:8080
-  # JWT密钥
-  jwt:
-    secret: E66559580A1ADF48CDD928516062F12E
-  # XSS 过滤配置
-  xss:
-    # 过滤开关
-    enabled: true
-    # 排除链接
-    excludes:
-      - /system/notice/*
-  file:
-    # 文件上传配置
-    upload:
-      # 上传路径
-      path: /Users/hasikiFire/upload
 --- #---------------------数据库配置---------------------------
-# spring:
-#   datasource:
-#     url: jdbc:mysql://localhost:3306/novel_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-#     username: root
-#     password: test123456
-
+spring:
+  datasource:
+    url: jdbc:mysql://aws.gedune.space:23306/shop_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: Gedune150.
 # XXL-JOB 配置
 # xxl:
 #   job:
@@ -82,9 +49,9 @@ network:
 #       password: ENDPOINT_ADMIN
 #       roles: ENDPOINT_ADMIN
 --- #--------------------接口文档配置---------------------------
-# springdoc:
-#   api-docs:
-#     enabled: true
+springdoc:
+  api-docs:
+    enabled: true
 --- #----------------------邮箱配置-----------------------------
 #邮箱服务器
 # spring:

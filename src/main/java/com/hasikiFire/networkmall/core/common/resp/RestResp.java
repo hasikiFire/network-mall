@@ -10,8 +10,7 @@ import com.hasikiFire.networkmall.core.common.constant.ErrorCodeEnum;
 /**
  * Http Rest 响应工具及数据格式封装
  *
- * @author xiongxiaoyang
- * @date 2022/5/11
+ * @author hasikiFire
  */
 @Getter
 public class RestResp<T> {
