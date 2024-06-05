@@ -44,7 +44,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
 
-    System.out.println("dto: " + dto);
     // 校验图形验证码是否正确
     // if (!verifyCodeManager.imgVerifyCodeOk(dto.getSessionId(), dto.getVelCode()))
     // {
@@ -58,7 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         dto.getEmail())
         .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
     if (userMapper.selectCount(queryWrapper) > 0) {
-      throw new BusinessException(ErrorCodeEnum.EMAIL_EXIST);
+      throw new BusinessException("邮箱已被注册");
     }
 
     // 注册成功，保存用户信息

@@ -23,4 +23,10 @@ public class BusinessException extends RuntimeException {
         this.errorCodeEnum = errorCodeEnum;
     }
 
+    public BusinessException(String msg) {
+        // 不调用父类 Throwable的fillInStackTrace() 方法生成栈追踪信息，提高应用性能
+        // 构造器之间的调用必须在第一行
+        super(msg, null, false, false);
+        this.errorCodeEnum = null;
+    }
 }

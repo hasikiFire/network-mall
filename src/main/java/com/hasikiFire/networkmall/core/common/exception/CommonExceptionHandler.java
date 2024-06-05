@@ -1,7 +1,11 @@
 package com.hasikiFire.networkmall.core.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.stream.Collectors;
+
 import org.springframework.validation.BindException;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -17,13 +21,13 @@ import com.hasikiFire.networkmall.core.common.resp.RestResp;
 @RestControllerAdvice
 public class CommonExceptionHandler {
 
-    /**
-     * 处理数据校验异常
-     */
     @ExceptionHandler(BindException.class)
     public RestResp<Void> handlerBindException(BindException e) {
         log.error(e.getMessage(), e);
-        return RestResp.fail(ErrorCodeEnum.USER_REQUEST_PARAM_ERROR);
+        String errorMessage = e.getBindingResult().getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+        return RestResp.fail(errorMessage);
     }
 
     /**
@@ -32,7 +36,12 @@ public class CommonExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public RestResp<Void> handlerBusinessException(BusinessException e) {
         log.error(e.getMessage(), e);
-        return RestResp.fail(e.getErrorCodeEnum());
+        ErrorCodeEnum errorCodeEnum = e.getErrorCodeEnum();
+        if (errorCodeEnum != null) {
+            return RestResp.fail(errorCodeEnum);
+        } else {
+            return RestResp.fail(e.getMessage());
+        }
     }
 
     /**

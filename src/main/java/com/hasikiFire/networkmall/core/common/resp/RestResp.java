@@ -3,8 +3,6 @@ package com.hasikiFire.networkmall.core.common.resp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.util.Objects;
-
 import com.hasikiFire.networkmall.core.common.constant.ErrorCodeEnum;
 
 /**
@@ -18,8 +16,8 @@ public class RestResp<T> {
     /**
      * 响应码
      */
-    @Schema(description = "错误码，00000-没有错误")
-    private String code;
+    @Schema(description = "错误码，0-成功")
+    private Integer code;
 
     /**
      * 响应消息
@@ -41,6 +39,11 @@ public class RestResp<T> {
     private RestResp(ErrorCodeEnum errorCode) {
         this.code = errorCode.getCode();
         this.message = errorCode.getMessage();
+    }
+
+    private RestResp(ErrorCodeEnum errorCode, String msg) {
+        this.code = errorCode.getCode();
+        this.message = msg;
     }
 
     private RestResp(T data) {
@@ -69,18 +72,15 @@ public class RestResp<T> {
         return new RestResp<>(errorCode);
     }
 
+    public static RestResp<Void> fail(String errorMessage) {
+        return new RestResp<>(ErrorCodeEnum.SYSTEM_ERROR, errorMessage);
+    }
+
     /**
      * 系统错误
      */
     public static RestResp<Void> error() {
         return new RestResp<>(ErrorCodeEnum.SYSTEM_ERROR);
-    }
-
-    /**
-     * 判断是否成功
-     */
-    public boolean isOk() {
-        return Objects.equals(this.code, ErrorCodeEnum.OK.getCode());
     }
 
 }
