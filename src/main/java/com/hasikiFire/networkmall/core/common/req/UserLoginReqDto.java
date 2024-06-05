@@ -8,8 +8,7 @@ import lombok.Data;
 /**
  * 用户登录 请求DTO
  *
- * @author xiongxiaoyang
- * @date 2022/5/16
+ * @author hasikiFire
  */
 @Data
 public class UserLoginReqDto {

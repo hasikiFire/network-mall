@@ -3,8 +3,8 @@ package com.hasikiFire.networkmall.core.common.constant;
 /**
  * 通用常量
  *
- * @author xiongxiaoyang
- * @date 2022/5/12
+ * @author hasikiFire
+ * @date 2024/6/4
  */
 public class CommonConsts {
 
