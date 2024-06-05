@@ -13,6 +13,7 @@ import com.hasikiFire.networkmall.core.common.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.common.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
+import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -60,5 +61,16 @@ public class UserController {
   @GetMapping("getUserInfo")
   public Map getUserInfo() {
     return userService.getUserInfo((long) 12312312);
+  }
+
+  /**
+   * Send email verification code interface
+   * 
+   * @return
+   */
+  @Operation(summary = "Send email verification code interface")
+  @PostMapping("sendEmailVerificationCode")
+  public RestResp<Void> sendEmailVerificationCode(@Valid @RequestBody UsersendEmailCodeDto email) {
+    return userService.sendEmailVerificationCode(email);
   }
 }

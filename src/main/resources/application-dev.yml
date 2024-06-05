@@ -8,6 +8,18 @@ spring:
     url: jdbc:mysql://aws.gedune.space:23306/shop_test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: Gedune150.
+  # 邮箱配置
+  mail:
+    host: smtp.163.com
+    port: 587
+    username: gedune123@163.com
+    password: APJBVMBRGLDIWCEB
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 # XXL-JOB 配置
 # xxl:
 #   job:

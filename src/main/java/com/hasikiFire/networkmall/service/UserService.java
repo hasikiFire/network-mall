@@ -5,6 +5,7 @@ import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.common.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
+import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 
@@ -36,6 +37,15 @@ public interface UserService extends IService<User> {
    * @return JWT + 昵称
    */
   RestResp<UserLoginRespDto> login(UserLoginReqDto dto);
+
+  /**
+   * 用户登录
+   *
+   * @param dto 登录参数
+   * @return
+   * @return JWT + 昵称
+   */
+  RestResp<Void> sendEmailVerificationCode(UsersendEmailCodeDto email);
 
   /**
    * 用户登录

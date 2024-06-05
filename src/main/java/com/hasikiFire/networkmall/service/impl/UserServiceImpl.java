@@ -12,6 +12,7 @@ import com.hasikiFire.networkmall.dao.entity.UserId;
 import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
+import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -25,8 +26,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * <p>
@@ -45,6 +53,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   private final UserIdMapper userIDMapper;
 
   private final JwtUtils jwtUtils;
+
+  @Autowired
+  private JavaMailSender javaMailSender;
 
   @Override
   public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
@@ -114,6 +125,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     map.put("age", "15");
     System.out.println("id = " + id);
     return map;
+
+  }
+
+  @Override
+  public RestResp<Void> sendEmailVerificationCode(UsersendEmailCodeDto email) {
+    try {
+      SimpleMailMessage message = new SimpleMailMessage();
+      String code = RandomStringUtils.randomNumeric(4);
+      message.setTo(email.getEmail());
+      message.setSubject("Verification Code");
+      message.setText("Your verification code is " + code);
+      javaMailSender.send(message);
+      return RestResp.ok();
+    } catch (MailException e) {
+      throw new BusinessException(e.getMessage());
+    }
 
   }
 }
