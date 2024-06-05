@@ -6,7 +6,10 @@ import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.JwtUtils;
+import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.dao.entity.User;
+import com.hasikiFire.networkmall.dao.entity.UserId;
+import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
@@ -39,6 +42,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   private final UserMapper userMapper;
 
+  private final UserIdMapper userIDMapper;
+
   private final JwtUtils jwtUtils;
 
   @Override
@@ -59,16 +64,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     if (userMapper.selectCount(queryWrapper) > 0) {
       throw new BusinessException("邮箱已被注册");
     }
+    // 随机取一个未使用的用户ID
+    QueryWrapper<UserId> queryWrapperUserID = new QueryWrapper<>();
+    queryWrapperUserID.eq("status", 0).orderByAsc("RAND()").last("LIMIT 1");
+    UserId userId = userIDMapper.selectOne(queryWrapperUserID);
+    if (userId != null) {
+      userId.setStatus(1);
+      userIDMapper.updateById(userId);
+    }
 
     // 注册成功，保存用户信息
     User user = new User();
+    String salt = PasswordUtils.generateSalt();
+    String passwordHash = DigestUtils.md5DigestAsHex(
+        (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
     user.setPasswordHash(
-        DigestUtils.md5DigestAsHex(dto.getPassword().getBytes(StandardCharsets.UTF_8)));
+        passwordHash);
     user.setName(dto.getName());
     user.setEmail(dto.getEmail());
-    user.setUserId(12345);
-    user.setStatus(0);
-    user.setSalt("0");
+    user.setUserId(userId.getUserId());
+    user.setStatus(1);
+    user.setSalt(salt);
     userMapper.insert(user);
 
     // 删除验证码
@@ -77,8 +93,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 生成JWT 并返回
     return RestResp.ok(
         UserRegisterRespDto.builder()
-            .token(jwtUtils.generateToken(user.getId()))
-            .uid(user.getId())
+            .token(jwtUtils.generateToken(user.getUserId()))
+            .uid(user.getUserId())
             .build());
   }
 
