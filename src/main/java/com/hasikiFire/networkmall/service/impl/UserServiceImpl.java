@@ -25,8 +25,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -54,18 +57,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   private final JwtUtils jwtUtils;
 
+  private final RedissonClient redissonClient;
+
   @Autowired
   private JavaMailSender javaMailSender;
 
   @Override
   public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
 
+    RBucket<String> bucket = redissonClient.getBucket(dto.getEmail());
+    String emailCode = bucket.get();
+
     // 校验图形验证码是否正确
-    // if (!verifyCodeManager.imgVerifyCodeOk(dto.getSessionId(), dto.getVelCode()))
-    // {
-    // // 图形验证码校验失败
-    // throw new BusinessException(ErrorCodeEnum.USER_VERIFY_CODE_ERROR);
-    // }
+    if (emailCode == null || !emailCode.equals(dto.getVelCode())) {
+      // 图形验证码校验失败
+      throw new BusinessException("验证码错误");
+    }
 
     // 校验邮箱是否已注册
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -99,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     userMapper.insert(user);
 
     // 删除验证码
-    // verifyCodeManager.removeImgVerifyCode(dto.getSessionId());
+    bucket.delete();
 
     // 生成JWT 并返回
     return RestResp.ok(
@@ -129,11 +136,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
-  public RestResp<Void> sendEmailVerificationCode(UsersendEmailCodeDto email) {
+  public RestResp<Void> sendEmailVerificationCode(UsersendEmailCodeDto emailDto) {
     try {
-      SimpleMailMessage message = new SimpleMailMessage();
       String code = RandomStringUtils.randomNumeric(4);
-      message.setTo(email.getEmail());
+      redissonClient.getBucket(emailDto.getEmail()).set(code, 10, TimeUnit.MINUTES);
+      SimpleMailMessage message = new SimpleMailMessage();
+      message.setFrom("123@163.com");
+      message.setTo(emailDto.getEmail());
       message.setSubject("Verification Code");
       message.setText("Your verification code is " + code);
       javaMailSender.send(message);
