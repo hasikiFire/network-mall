@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hasikiFire.networkmall.core.common.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.common.resp.UserInfoRespDto;
+import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
 
+import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,5 +73,12 @@ public class UserController {
   @PostMapping("sendEmailVerificationCode")
   public RestResp<Void> sendEmailVerificationCode(@Valid @RequestBody UsersendEmailCodeDto email) {
     return userService.sendEmailVerificationCode(email);
+  }
+
+  // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
+  @Operation(summary = "查询登录状态")
+  @GetMapping("isLogin")
+  public String isLogin() {
+    return "当前会话是否登录：" + StpUtil.isLogin();
   }
 }

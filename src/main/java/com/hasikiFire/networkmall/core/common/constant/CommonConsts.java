@@ -1,5 +1,7 @@
 package com.hasikiFire.networkmall.core.common.constant;
 
+import lombok.Getter;
+
 /**
  * 通用常量
  *
@@ -52,4 +54,5 @@ public class CommonConsts {
         }
 
     }
+
 }

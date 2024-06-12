@@ -23,6 +23,7 @@
 		<redisson.version>3.19.1</redisson.version>
 		<spring-boot-admin.version>3.0.0-M1</spring-boot-admin.version>
 		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
+		<sa-token-spring-boot3-starter.version>1.38.0</sa-token-spring-boot3-starter.version>
 		<jjwt.version>0.11.5</jjwt.version>
 	</properties>
 	<dependencies>
@@ -61,24 +62,11 @@
 			<optional>true</optional>
 		</dependency> -->
 
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-spring-boot3-starter</artifactId>
 
-		<!-- JWT 相关 -->
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-			<version>${jjwt.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-impl</artifactId>
-			<version>${jjwt.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-jackson</artifactId>
-			<version>${jjwt.version}</version>
-			<scope>runtime</scope>
+			<version>${sa-token-spring-boot3-starter.version}</version>
 		</dependency>
 
 		<!-- mybatis-plus -->

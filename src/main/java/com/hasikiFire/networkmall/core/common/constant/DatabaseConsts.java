@@ -23,6 +23,39 @@ public class DatabaseConsts {
 
     }
 
+    public static class RolesTable {
+
+        private RolesTable() {
+            throw new IllegalStateException(SystemConfigConsts.CONST_INSTANCE_EXCEPTION_MSG);
+        }
+
+        public static final String COLUMN_EMAIL = "email";
+
+        public enum RoleEnum {
+
+            /**
+             * 管理员
+             */
+            ADMIN("admin"),
+
+            /**
+             * 普通用户
+             */
+            USER("user");
+
+            RoleEnum(String roleName) {
+                this.roleName = roleName;
+            }
+
+            private String roleName;
+
+            public String getRoleName() {
+                return roleName;
+            }
+
+        }
+    }
+
     /**
      * 通用列枚举类
      */
