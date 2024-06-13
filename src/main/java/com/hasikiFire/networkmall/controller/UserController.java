@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2024/06/03
  */
 @RestController
-@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
@@ -41,7 +40,7 @@ public class UserController {
    * 用户注册接口
    */
   @Operation(summary = "用户注册接口")
-  @PostMapping("register")
+  @PostMapping("/user/register")
   public RestResp<UserRegisterRespDto> register(@Valid @RequestBody UserRegisterReqDto dto) {
     return userService.register(dto);
   }
@@ -50,7 +49,7 @@ public class UserController {
    * 用户登录接口
    */
   @Operation(summary = "用户登录接口")
-  @PostMapping("login")
+  @PostMapping("/user/login")
   public RestResp<UserLoginRespDto> login(@Valid @RequestBody UserLoginReqDto dto) {
     return userService.login(dto);
   }
@@ -59,7 +58,7 @@ public class UserController {
    * 用户信息查询接口
    */
   @Operation(summary = "用户信息查询接口")
-  @GetMapping("getUserInfo")
+  @GetMapping("/user/getUserInfo")
   public RestResp<UserInfoRespDto> getUserInfo(Integer userId) {
     return userService.getUserInfo(userId);
   }
@@ -70,22 +69,29 @@ public class UserController {
    * @return
    */
   @Operation(summary = "Send email verification code interface")
-  @PostMapping("sendEmailVerificationCode")
+  @PostMapping("/user/sendEmailVerificationCode")
   public RestResp<Void> sendEmailVerificationCode(@Valid @RequestBody UsersendEmailCodeDto email) {
     return userService.sendEmailVerificationCode(email);
   }
 
   // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
   @Operation(summary = "查询登录状态")
-  @GetMapping("isLogin")
+  @GetMapping("/user/isLogin")
   public String isLogin() {
     return "当前会话是否登录：" + StpUtil.isLogin();
   }
 
-  // @Operation(summary = "重置密码接口")
+  // TODO 需要思考要放啥数据
+  @Operation(summary = "查询用户列表")
+  @GetMapping("/admin/getUserList")
+  public RestResp<Void> getUserList() {
+    return userService.getUserList();
+  }
+
+  // @Operation(summary = "重置密码接口") TODO
   // @PostMapping("resetPassword")
   // public RestResp<UserLoginRespDto> resetPassword(String email) {
-  //   return userService.resetPassword(email);
-  //   // https://juejin.cn/post/6844903777246560263
+  // return userService.resetPassword(email);
+  // // https://juejin.cn/post/6844903777246560263
   // }
 }
