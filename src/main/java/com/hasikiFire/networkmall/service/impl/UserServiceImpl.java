@@ -225,6 +225,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<User>();
     queryWrapper.eq(User::getDeleted, 0);
+    if (params.getUserId() != null) {
+      queryWrapper.eq(User::getUserId, params.getUserId());
+    }
     if (params.getName() != null) {
       queryWrapper.like(User::getName, params.getName());
     }
@@ -237,7 +240,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     IPage<User> usersPage = userMapper.selectPage(page, queryWrapper);
     List<User> users = usersPage.getRecords();
 
-    // TODO 聚合查询
+    // TODO 聚合查询 循环查询每个用户的钱包，激活的套餐?
 
     // walletMapper.selectList(new QueryWrapper<>());
     // packagePurchaseRecordMapper.selectList(new QueryWrapper<>());
