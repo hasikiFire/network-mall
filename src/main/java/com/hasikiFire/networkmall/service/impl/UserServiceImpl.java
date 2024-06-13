@@ -10,22 +10,26 @@ package com.hasikiFire.networkmall.service.impl;
 
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts;
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts.RolesTable.RoleEnum;
-import com.hasikiFire.networkmall.core.common.constant.ErrorCodeEnum;
 import com.hasikiFire.networkmall.core.common.constant.SendCodeTypeEnum;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.core.util.RedisUtil;
 import com.hasikiFire.networkmall.dao.entity.Roles;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dao.entity.UserId;
+import com.hasikiFire.networkmall.dao.mapper.PackagePurchaseRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
+import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
+import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
+import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -33,13 +37,18 @@ import com.hasikiFire.networkmall.service.UserService;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.redisson.api.RBucket;
@@ -70,6 +79,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   private final UserMapper userMapper;
 
   private final UserIdMapper userIDMapper;
+
+  private final WalletMapper walletMapper;
+  private final PackagePurchaseRecordMapper packagePurchaseRecordMapper;
 
   private final RolesMapper roleMapper;
 
@@ -203,6 +215,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     } catch (MailException e) {
       throw new BusinessException(e.getMessage());
     }
+  }
+
+  @Override
+  public RestResp<PageRespDto<UserListRespDto>> getUserList(UserListReqDto params) {
+    IPage<User> page = new Page<>();
+    page.setCurrent(params.getPageNum());
+    page.setSize(params.getPageSize());
+
+    LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<User>();
+    queryWrapper.eq(User::getDeleted, 0);
+    if (params.getName() != null) {
+      queryWrapper.like(User::getName, params.getName());
+    }
+    if (params.getEmail() != null) {
+      queryWrapper.like(User::getEmail, params.getEmail());
+    }
+
+    queryWrapper.orderByDesc(User::getUpdatedAt);
+    queryWrapper.last("LIMIT " + params.getPageSize());
+    IPage<User> usersPage = userMapper.selectPage(page, queryWrapper);
+    List<User> users = usersPage.getRecords();
+
+    // TODO 聚合查询
+
+    // walletMapper.selectList(new QueryWrapper<>());
+    // packagePurchaseRecordMapper.selectList(new QueryWrapper<>());
+
+    return RestResp.ok(
+        PageRespDto.of(params.getPageNum(), params.getPageSize(), page.getTotal(),
+            users.stream().map(user -> UserListRespDto.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build()).collect(Collectors.toList())));
 
   }
+
 }

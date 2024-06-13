@@ -21,6 +21,7 @@ public class DatabaseConsts {
 
         public static final String COLUMN_EMAIL = "email";
         public static final String COLUMN_USERID = "user_id";
+
     }
 
     public static class RolesTable {
@@ -43,11 +44,11 @@ public class DatabaseConsts {
              */
             USER("user");
 
-            RoleEnum(String roleName) {
+            RoleEnum(final String roleName) {
                 this.roleName = roleName;
             }
 
-            private String roleName;
+            private final String roleName;
 
             public String getRoleName() {
                 return roleName;
@@ -67,9 +68,9 @@ public class DatabaseConsts {
         CREATE_TIME("create_time"),
         UPDATE_TIME("update_time");
 
-        private String name;
+        private final String name;
 
-        CommonColumnEnum(String name) {
+        CommonColumnEnum(final String name) {
             this.name = name;
         }
 
@@ -87,9 +88,9 @@ public class DatabaseConsts {
         LIMIT_30("limit 30"),
         LIMIT_500("limit 500");
 
-        private String sql;
+        private final String sql;
 
-        SqlEnum(String sql) {
+        SqlEnum(final String sql) {
             this.sql = sql;
         }
 

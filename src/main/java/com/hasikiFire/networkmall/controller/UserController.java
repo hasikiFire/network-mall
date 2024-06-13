@@ -6,14 +6,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
+import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
+import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -32,6 +34,7 @@ import lombok.RequiredArgsConstructor;
  * @since 2024/06/03
  */
 @RestController
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
@@ -40,7 +43,7 @@ public class UserController {
    * 用户注册接口
    */
   @Operation(summary = "用户注册接口")
-  @PostMapping("/user/register")
+  @PostMapping("/register")
   public RestResp<UserRegisterRespDto> register(@Valid @RequestBody UserRegisterReqDto dto) {
     return userService.register(dto);
   }
@@ -49,7 +52,7 @@ public class UserController {
    * 用户登录接口
    */
   @Operation(summary = "用户登录接口")
-  @PostMapping("/user/login")
+  @PostMapping("/login")
   public RestResp<UserLoginRespDto> login(@Valid @RequestBody UserLoginReqDto dto) {
     return userService.login(dto);
   }
@@ -58,7 +61,7 @@ public class UserController {
    * 用户信息查询接口
    */
   @Operation(summary = "用户信息查询接口")
-  @GetMapping("/user/getUserInfo")
+  @GetMapping("/getUserInfo")
   public RestResp<UserInfoRespDto> getUserInfo(Integer userId) {
     return userService.getUserInfo(userId);
   }
@@ -69,23 +72,16 @@ public class UserController {
    * @return
    */
   @Operation(summary = "Send email verification code interface")
-  @PostMapping("/user/sendEmailVerificationCode")
+  @PostMapping("/sendEmailCode")
   public RestResp<Void> sendEmailVerificationCode(@Valid @RequestBody UsersendEmailCodeDto email) {
     return userService.sendEmailVerificationCode(email);
   }
 
-  // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
+  // 查询登录状态，浏览器访问： http://localhost:8081/isLogin
   @Operation(summary = "查询登录状态")
-  @GetMapping("/user/isLogin")
+  @GetMapping("/isLogin")
   public String isLogin() {
     return "当前会话是否登录：" + StpUtil.isLogin();
-  }
-
-  // TODO 需要思考要放啥数据
-  @Operation(summary = "查询用户列表")
-  @GetMapping("/admin/getUserList")
-  public RestResp<Void> getUserList() {
-    return userService.getUserList();
   }
 
   // @Operation(summary = "重置密码接口") TODO

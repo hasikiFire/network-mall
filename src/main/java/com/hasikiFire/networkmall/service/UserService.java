@@ -1,11 +1,14 @@
 package com.hasikiFire.networkmall.service;
 
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.User;
+import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
 import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
+import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 
@@ -37,20 +40,11 @@ public interface UserService extends IService<User> {
   RestResp<UserLoginRespDto> login(UserLoginReqDto dto);
 
   /**
-   * 用户登录
-   *
-   * @param dto 登录参数
-   * @return
-   * @return JWT + 昵称
    */
   RestResp<Void> sendEmailVerificationCode(UsersendEmailCodeDto email);
 
-  /**
-   * 用户登录
-   *
-   * @param dto 登录参数
-   * @return JWT + 昵称
-   */
   RestResp<UserInfoRespDto> getUserInfo(Integer userId);
+
+  RestResp<PageRespDto<UserListRespDto>> getUserList(UserListReqDto params);
 
 }
