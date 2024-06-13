@@ -20,7 +20,7 @@ public class DatabaseConsts {
         }
 
         public static final String COLUMN_EMAIL = "email";
-
+        public static final String COLUMN_USERID = "user_id";
     }
 
     public static class RolesTable {

@@ -1,10 +1,12 @@
 package com.hasikiFire.networkmall.dto.req;
 
+import com.hasikiFire.networkmall.core.common.constant.SendCodeTypeEnum;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
 
 /**
  * 用户注册 请求DTO
@@ -18,5 +20,9 @@ public class UsersendEmailCodeDto {
     @NotBlank(message = "邮箱不能为空！")
     @Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+).com$", message = "邮箱格式不正确！")
     private String email;
+
+    @Schema(description = "类型：SendCodeTypeEnum", required = true)
+    @NotNull(message = "类型不能为空！")
+    private SendCodeTypeEnum type;
 
 }

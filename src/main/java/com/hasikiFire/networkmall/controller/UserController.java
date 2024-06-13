@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
-import com.hasikiFire.networkmall.core.common.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
+import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -60,8 +60,8 @@ public class UserController {
    */
   @Operation(summary = "用户信息查询接口")
   @GetMapping("getUserInfo")
-  public Map getUserInfo() {
-    return userService.getUserInfo((long) 12312312);
+  public RestResp<UserInfoRespDto> getUserInfo(Integer userId) {
+    return userService.getUserInfo(userId);
   }
 
   /**
@@ -81,4 +81,11 @@ public class UserController {
   public String isLogin() {
     return "当前会话是否登录：" + StpUtil.isLogin();
   }
+
+  // @Operation(summary = "重置密码接口")
+  // @PostMapping("resetPassword")
+  // public RestResp<UserLoginRespDto> resetPassword(String email) {
+  //   return userService.resetPassword(email);
+  //   // https://juejin.cn/post/6844903777246560263
+  // }
 }

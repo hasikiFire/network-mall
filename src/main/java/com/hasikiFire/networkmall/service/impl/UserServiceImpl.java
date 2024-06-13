@@ -1,11 +1,21 @@
+/*
+ * @Author: hasikiFire
+ * @Date: 2024-06-04 11:13:28
+ */
+/*
+ * @Author: hasikiFire
+ * @Date: 2024-06-04 11:13:28
+ */
 package com.hasikiFire.networkmall.service.impl;
 
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts;
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts.RolesTable.RoleEnum;
 import com.hasikiFire.networkmall.core.common.constant.ErrorCodeEnum;
+import com.hasikiFire.networkmall.core.common.constant.SendCodeTypeEnum;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.PasswordUtils;
+import com.hasikiFire.networkmall.core.util.RedisUtil;
 import com.hasikiFire.networkmall.dao.entity.Roles;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dao.entity.UserId;
@@ -15,6 +25,7 @@ import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
+import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -62,16 +73,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   private final RolesMapper roleMapper;
 
-  private final RedissonClient redissonClient;
+  @Autowired
+  private RedisUtil redisUtil;
 
   @Autowired
   private JavaMailSender javaMailSender;
 
   @Override
   public RestResp<UserRegisterRespDto> register(UserRegisterReqDto dto) {
-
-    RBucket<String> bucket = redissonClient.getBucket(dto.getEmail());
-    String emailCode = bucket.get();
+    String redisKey = SendCodeTypeEnum.REGISTER.getType() + ":" + dto.getEmail();
+    String emailCode = (String) redisUtil.get(redisKey);
 
     // 校验验证码是否正确
     if (emailCode == null || !emailCode.equals(dto.getVelCode())) {
@@ -91,10 +102,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     QueryWrapper<UserId> queryWrapperUserID = new QueryWrapper<>();
     queryWrapperUserID.eq("status", 0).orderByAsc("RAND()").last("LIMIT 1");
     UserId userIdDto = userIDMapper.selectOne(queryWrapperUserID);
-    if (userIdDto != null) {
-      userIdDto.setStatus(1);
-      userIDMapper.updateById(userIdDto);
+    if (userIdDto == null) {
+      throw new BusinessException("用户ID已用完");
     }
+    userIdDto.setStatus(1);
+    userIDMapper.updateById(userIdDto);
     Integer userID = userIdDto.getUserId();
     // 注册成功，保存用户信息
     User user = new User();
@@ -111,7 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     userMapper.insert(user);
 
     // 删除验证码
-    bucket.delete();
+    redisUtil.delete(redisKey);
     Roles role = new Roles();
     role.setUserId(user.getUserId());
     role.setRoleName(RoleEnum.USER.getRoleName());
@@ -156,25 +168,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
-  public Map getUserInfo(Long id) {
-    Map map = new HashMap<>();
-    map.put("name", "fangxiao");
-    map.put("age", "15");
-    System.out.println("id = " + id);
-    return map;
-
+  public RestResp<UserInfoRespDto> getUserInfo(Integer id) {
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_USERID,
+        id)
+        .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
+    User user = userMapper.selectOne(queryWrapper);
+    if (user == null) {
+      throw new BusinessException("用户不存在");
+    }
+    return RestResp.ok(
+        UserInfoRespDto.builder()
+            .userId(user.getUserId())
+            .name(user.getName())
+            .email(user.getEmail())
+            .createdAt(user.getCreatedAt())
+            .updatedAt(user.getUpdatedAt())
+            .build());
   }
 
   @Override
   public RestResp<Void> sendEmailVerificationCode(UsersendEmailCodeDto emailDto) {
     try {
+      String redisKey = emailDto.getType().getType() + ":" + emailDto.getEmail();
       String code = RandomStringUtils.randomNumeric(4);
-      redissonClient.getBucket(emailDto.getEmail()).set(code, 10, TimeUnit.MINUTES);
+      redisUtil.set(redisKey, code, 10, TimeUnit.MINUTES);
       SimpleMailMessage message = new SimpleMailMessage();
       message.setFrom(username);
       message.setTo(emailDto.getEmail());
       message.setSubject("验证码");
-      message.setText("你的验证吗为 " + code + " ，有效期为 10 分钟");
+      message.setText("本次" + emailDto.getType().getDesc() + "为: " + code + " ，有效期为 10 分钟");
       javaMailSender.send(message);
       return RestResp.ok();
     } catch (MailException e) {

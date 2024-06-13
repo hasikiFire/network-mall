@@ -1,15 +1,13 @@
 package com.hasikiFire.networkmall.service;
 
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
-import com.hasikiFire.networkmall.core.common.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
 import com.hasikiFire.networkmall.dto.req.UsersendEmailCodeDto;
+import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
-
-import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -53,6 +51,6 @@ public interface UserService extends IService<User> {
    * @param dto 登录参数
    * @return JWT + 昵称
    */
-  Map getUserInfo(Long userId);
+  RestResp<UserInfoRespDto> getUserInfo(Integer userId);
 
 }
