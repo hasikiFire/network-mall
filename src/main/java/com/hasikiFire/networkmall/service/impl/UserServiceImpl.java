@@ -16,9 +16,11 @@ import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.PasswordUtils;
 import com.hasikiFire.networkmall.core.util.RedisUtil;
+import com.hasikiFire.networkmall.dao.entity.PackagePurchaseRecord;
 import com.hasikiFire.networkmall.dao.entity.Roles;
 import com.hasikiFire.networkmall.dao.entity.User;
 import com.hasikiFire.networkmall.dao.entity.UserId;
+import com.hasikiFire.networkmall.dao.entity.Wallet;
 import com.hasikiFire.networkmall.dao.mapper.PackagePurchaseRecordMapper;
 import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
@@ -36,6 +38,7 @@ import com.hasikiFire.networkmall.service.UserService;
 
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -44,6 +47,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +75,7 @@ import org.springframework.mail.javamail.JavaMailSender;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
   @Value("${spring.mail.username}")
@@ -235,26 +240,65 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       queryWrapper.like(User::getEmail, params.getEmail());
     }
 
-    queryWrapper.orderByDesc(User::getUpdatedAt);
+    // queryWrapper.orderByDesc(User::getUpdatedAt);
     queryWrapper.last("LIMIT " + params.getPageSize());
+    // IPage<User> usersPage = userMapper.selectPage(page, queryWrapper);
+    // List<User> users = usersPage.getRecords();
+    // queryWrapper.orderByDesc(User::getUpdatedAt);
     IPage<User> usersPage = userMapper.selectPage(page, queryWrapper);
     List<User> users = usersPage.getRecords();
 
-    // TODO 聚合查询 循环查询每个用户的钱包，激活的套餐?
+    // 2. 获取所有的userId
+    List<Integer> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
+    log.info("User IDs: {}", userIds);
+    // 3. 根据userId查询wallet表, 取出balance和currency字段
+    List<Wallet> wallets = walletMapper.selectList(new QueryWrapper<Wallet>().in("user_id", userIds)
+        .select("user_id", "balance", "currency"));
+    log.info("User wallets: {}", wallets);
 
-    // walletMapper.selectList(new QueryWrapper<>());
-    // packagePurchaseRecordMapper.selectList(new QueryWrapper<>());
+    // 4. 根据userId查询PackagePurchaseRecord表，筛选出purchaseStatus为1的记录
+    List<PackagePurchaseRecord> packageRecords = packagePurchaseRecordMapper.selectList(
+        new QueryWrapper<PackagePurchaseRecord>().in("user_id", userIds)
+            .eq("purchase_status", 1));
+    log.info("User packageRecords: {}", packageRecords);
+
+    Map<Integer, Wallet> userIdToWalletMap = wallets.stream()
+        .collect(Collectors.toMap(Wallet::getUserId, wallet -> wallet));
+    Map<Integer, List<PackagePurchaseRecord>> userIdToPackageRecordsMap = packageRecords.stream()
+        .collect(Collectors.groupingBy(PackagePurchaseRecord::getUserId));
+
+    List<UserListRespDto> userListRespDtos = users.stream().map(user -> {
+      Integer userId = user.getUserId();
+      Wallet userWallet = userIdToWalletMap.get(userId); // 假设每个用户只有一个wallet
+      List<PackagePurchaseRecord> userPackageRecords = userIdToPackageRecordsMap.getOrDefault(userId,
+          new ArrayList<>());
+
+      return UserListRespDto.builder()
+          .userId(user.getUserId())
+          .name(user.getName())
+          .email(user.getEmail())
+          .status(user.getStatus())
+          .createdAt(user.getCreatedAt())
+          .updatedAt(user.getUpdatedAt())
+
+          .balance(userWallet != null ? userWallet.getBalance() : null)
+          .currency(userWallet != null ? userWallet.getCurrency() : null)
+          .packageRecords(userPackageRecords)
+          .build();
+    }).collect(Collectors.toList());
 
     return RestResp.ok(
-        PageRespDto.of(params.getPageNum(), params.getPageSize(), page.getTotal(),
-            users.stream().map(user -> UserListRespDto.builder()
-                .userId(user.getUserId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .build()).collect(Collectors.toList())));
+        PageRespDto.of(params.getPageNum(), params.getPageSize(), page.getTotal(), userListRespDtos));
+    // return RestResp.ok(
+    // PageRespDto.of(params.getPageNum(), params.getPageSize(), page.getTotal(),
+    // users.stream().map(user -> UserListRespDto.builder()
+    // .userId(user.getUserId())
+    // .name(user.getName())
+    // .email(user.getEmail())
+    // .status(user.getStatus())
+    // .createdAt(user.getCreatedAt())
+    // .updatedAt(user.getUpdatedAt())
+    // .build()).collect(Collectors.toList())));
 
   }
 

@@ -1,8 +1,11 @@
 package com.hasikiFire.networkmall.dto.resp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hasikiFire.networkmall.dao.entity.PackagePurchaseRecord;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -29,4 +32,18 @@ public class UserListRespDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+    /**
+     * 余额
+     */
+    @Schema(description = "余额")
+    private BigDecimal balance;
+
+    /**
+     * 货币类型（1：人民币 2: USDT）
+     */
+    @Schema(description = "货币类型（1：人民币 2: USDT）")
+    private String currency;
+
+    private List<PackagePurchaseRecord> packageRecords;
 }
