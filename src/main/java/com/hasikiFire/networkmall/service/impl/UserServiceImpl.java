@@ -12,6 +12,7 @@ import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts;
 import com.hasikiFire.networkmall.core.common.constant.DatabaseConsts.RolesTable.RoleEnum;
 import com.hasikiFire.networkmall.core.common.constant.SendCodeTypeEnum;
 import com.hasikiFire.networkmall.core.common.exception.BusinessException;
+import com.hasikiFire.networkmall.core.common.req.UserDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.core.util.PasswordUtils;
@@ -26,6 +27,7 @@ import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
+import com.hasikiFire.networkmall.dto.req.UsedEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
@@ -107,38 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       throw new BusinessException("验证码错误");
     }
 
-    // 校验邮箱是否已注册
-    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_EMAIL,
-        dto.getEmail())
-        .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
-    if (userMapper.selectCount(queryWrapper) > 0) {
-      throw new BusinessException("邮箱已被注册");
-    }
-    // 随机取一个未使用的用户ID
-    QueryWrapper<UserId> queryWrapperUserID = new QueryWrapper<>();
-    queryWrapperUserID.eq("status", 0).orderByAsc("RAND()").last("LIMIT 1");
-    UserId userIdDto = userIDMapper.selectOne(queryWrapperUserID);
-    if (userIdDto == null) {
-      throw new BusinessException("用户ID已用完");
-    }
-    userIdDto.setStatus(1);
-    userIDMapper.updateById(userIdDto);
-    Integer userID = userIdDto.getUserId();
-    // 注册成功，保存用户信息
-    User user = new User();
-    String salt = PasswordUtils.generateSalt();
-    String passwordHash = DigestUtils.md5DigestAsHex(
-        (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
-    user.setPasswordHash(
-        passwordHash);
-    user.setName(dto.getName());
-    user.setEmail(dto.getEmail());
-    user.setUserId(userID);
-    user.setStatus(1);
-    user.setSalt(salt);
-    userMapper.insert(user);
-
+    User user = saveUser((UserDto) dto);
     // 删除验证码
     redisUtil.delete(redisKey);
     Roles role = new Roles();
@@ -302,4 +273,56 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   }
 
+  @Override
+  public RestResp<User> updateUser(UsedEditDto dto) {
+    // 创建 User 实体对象
+    User user = saveUser((UserDto) dto);
+    // 检查插入结果
+    if (user != null) {
+      throw new BusinessException("更新失败");
+    }
+    return RestResp.ok(user);
+
+  }
+
+  private User saveUser(UserDto dto) {
+    // 校验邮箱是否已注册
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_EMAIL,
+        dto.getEmail())
+        .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
+    if (userMapper.selectCount(queryWrapper) > 0) {
+      throw new BusinessException("邮箱已被注册");
+    }
+    // 随机取一个未使用的用户ID
+    QueryWrapper<UserId> queryWrapperUserID = new QueryWrapper<>();
+    queryWrapperUserID.eq("status", 0).orderByAsc("RAND()").last("LIMIT 1");
+    UserId userIdDto = userIDMapper.selectOne(queryWrapperUserID);
+    if (userIdDto == null) {
+      throw new BusinessException("用户ID已用完");
+    }
+    userIdDto.setStatus(1);
+    userIDMapper.updateById(userIdDto);
+    Integer userID = userIdDto.getUserId();
+    // 注册成功，保存用户信息
+    User user = new User();
+    String salt = PasswordUtils.generateSalt();
+    String passwordHash = DigestUtils.md5DigestAsHex(
+        (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
+    user.setPasswordHash(
+        passwordHash);
+    user.setName(dto.getName());
+    user.setEmail(dto.getEmail());
+    user.setUserId(userID);
+    user.setStatus(1);
+    user.setSalt(salt);
+    userMapper.insert(user);
+    return user;
+  }
+
+  @Override
+  public RestResp<String> deleteUser(Integer status) {
+    return null;
+    // 在这里实现 deleteUser 方法
+  }
 }
