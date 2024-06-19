@@ -27,7 +27,8 @@ import com.hasikiFire.networkmall.dao.mapper.RolesMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserIdMapper;
 import com.hasikiFire.networkmall.dao.mapper.UserMapper;
 import com.hasikiFire.networkmall.dao.mapper.WalletMapper;
-import com.hasikiFire.networkmall.dto.req.UsedEditDto;
+import com.hasikiFire.networkmall.dto.req.UserCreateDto;
+import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
@@ -39,6 +40,7 @@ import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
 import com.hasikiFire.networkmall.service.UserService;
 
 import cn.dev33.satoken.stp.StpUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -109,7 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       throw new BusinessException("验证码错误");
     }
 
-    User user = saveUser((UserDto) dto);
+    User user = createNewUser((UserDto) dto);
     // 删除验证码
     redisUtil.delete(redisKey);
     Roles role = new Roles();
@@ -274,18 +276,84 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
-  public RestResp<User> updateUser(UsedEditDto dto) {
-    // 创建 User 实体对象
-    User user = saveUser((UserDto) dto);
-    // 检查插入结果
-    if (user != null) {
+  public RestResp<User> updateUser(UserEditDto dto) {
+    User user = null;
+    if (dto.getUserId() == null) {
+      user = createNewUser((UserDto) dto);
+    } else {
+      LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper.eq(User::getUserId, dto.getUserId());
+      user = userMapper.selectOne(queryWrapper);
+      log.info("User: selectOne {}", user);
+      if (user == null) {
+        throw new BusinessException("用户不存在");
+      } else {
+        user = updateNewUser(dto, user);
+      }
+    }
+
+    if (user == null) {
       throw new BusinessException("更新失败");
     }
+
     return RestResp.ok(user);
 
   }
 
-  private User saveUser(UserDto dto) {
+  private User updateNewUser(UserEditDto newUserDtoser, User oldUser) {
+    log.info("User: newUserDtoser {}", newUserDtoser);
+    // 注册成功，保存用户信息
+
+    if (newUserDtoser.getPassword() != null) {
+      String salt = PasswordUtils.generateSalt();
+      String passwordHash = DigestUtils.md5DigestAsHex(
+          (newUserDtoser.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
+      oldUser.setPasswordHash(
+          passwordHash);
+      oldUser.setSalt(salt);
+    }
+    if (newUserDtoser.getName() != null) {
+      oldUser.setName(newUserDtoser.getName());
+    }
+    if (newUserDtoser.getInviteCode() != null) {
+      oldUser.setInviteCode(newUserDtoser.getInviteCode());
+    }
+    if (newUserDtoser.getEmail() != null) {
+      if (!newUserDtoser.getEmail().equals(oldUser.getEmail())) {
+        throw new BusinessException("新邮箱与旧邮箱一致，无需修改");
+      }
+      // 校验邮箱是否已注册
+      QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+      queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_EMAIL,
+          newUserDtoser.getEmail())
+          .last(DatabaseConsts.SqlEnum.LIMIT_1.getSql());
+      if (userMapper.selectCount(queryWrapper) > 0) {
+        throw new BusinessException("邮箱已被注册");
+      }
+      oldUser.setEmail(newUserDtoser.getEmail());
+    }
+    if (newUserDtoser.getStatus() != null) {
+      oldUser.setStatus(newUserDtoser.getStatus());
+    }
+
+    userMapper.updateById(oldUser);
+    log.info("User: updateNewUser {}", oldUser);
+    // 随机取一个未使用的用户ID
+    LambdaQueryWrapper<UserId> queryWrapperUserID = new LambdaQueryWrapper<>();
+    queryWrapperUserID.eq(UserId::getUserId, newUserDtoser.getUserId());
+    UserId userIdModal = userIDMapper.selectOne(queryWrapperUserID);
+    if (userIdModal != null) {
+      userIdModal.setStatus(1);
+      userIDMapper.updateById(userIdModal);
+    } else {
+      log.info("用户userID 未在user_id 数据库里", userIdModal);
+    }
+
+    log.info("User: updateNewUser {}", oldUser);
+    return oldUser;
+  }
+
+  private User createNewUser(UserDto dto) {
     // 校验邮箱是否已注册
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
     queryWrapper.eq(DatabaseConsts.UserInfoTable.COLUMN_EMAIL,
@@ -297,15 +365,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 随机取一个未使用的用户ID
     QueryWrapper<UserId> queryWrapperUserID = new QueryWrapper<>();
     queryWrapperUserID.eq("status", 0).orderByAsc("RAND()").last("LIMIT 1");
-    UserId userIdDto = userIDMapper.selectOne(queryWrapperUserID);
-    if (userIdDto == null) {
+    UserId userIdModal = userIDMapper.selectOne(queryWrapperUserID);
+    if (userIdModal == null) {
       throw new BusinessException("用户ID已用完");
     }
-    userIdDto.setStatus(1);
-    userIDMapper.updateById(userIdDto);
-    Integer userID = userIdDto.getUserId();
+    userIdModal.setStatus(1);
+    userIDMapper.updateById(userIdModal);
+    Integer userID = userIdModal.getUserId();
     // 注册成功，保存用户信息
     User user = new User();
+    if (dto.getPassword() == null) {
+      throw new BusinessException("密码不能为空");
+    }
+    if (dto.getEmail() == null) {
+      throw new BusinessException("邮箱不能为空");
+    }
+    if (dto.getName() == null) {
+      throw new BusinessException("名字不能为空");
+    }
     String salt = PasswordUtils.generateSalt();
     String passwordHash = DigestUtils.md5DigestAsHex(
         (dto.getPassword() + salt).getBytes(StandardCharsets.UTF_8));
@@ -324,5 +401,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   public RestResp<String> deleteUser(Integer status) {
     return null;
     // 在这里实现 deleteUser 方法
+  }
+
+  @Override
+  public RestResp<User> createUser(@Valid UserCreateDto dto) {
+    User user = createNewUser((UserDto) dto);
+
+    if (user == null) {
+      throw new BusinessException("创建失败");
+    }
+    return RestResp.ok(user);
   }
 }

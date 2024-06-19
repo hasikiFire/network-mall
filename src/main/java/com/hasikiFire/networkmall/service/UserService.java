@@ -3,7 +3,8 @@ package com.hasikiFire.networkmall.service;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.User;
-import com.hasikiFire.networkmall.dto.req.UsedEditDto;
+import com.hasikiFire.networkmall.dto.req.UserCreateDto;
+import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.req.UserLoginReqDto;
 import com.hasikiFire.networkmall.dto.req.UserRegisterReqDto;
@@ -12,6 +13,8 @@ import com.hasikiFire.networkmall.dto.resp.UserInfoRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserLoginRespDto;
 import com.hasikiFire.networkmall.dto.resp.UserRegisterRespDto;
+
+import jakarta.validation.Valid;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -48,7 +51,9 @@ public interface UserService extends IService<User> {
 
   RestResp<PageRespDto<UserListRespDto>> getUserList(UserListReqDto params);
 
-  RestResp<User> updateUser(UsedEditDto user);
+  RestResp<User> updateUser(UserEditDto user);
 
   RestResp<String> deleteUser(Integer status);
+
+  RestResp<User> createUser(UserCreateDto user);
 }

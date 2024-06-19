@@ -6,17 +6,19 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import com.hasikiFire.networkmall.core.common.req.UserDto;
+
 /**
  * 用户注册 请求DTO
  *
  * @author hasikiFire
  */
 @Data
-public class UserRegisterReqDto {
+public class UserRegisterReqDto implements UserDto {
 
     @Schema(description = "邮箱", required = true)
     @NotBlank(message = "邮箱不能为空！")
-    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+).com$", message = "邮箱格式不正确！")
+    @Pattern(regexp = "^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$", message = "邮箱格式不正确！")
     private String email;
 
     @Schema(description = "昵称", required = true)

@@ -8,7 +8,6 @@ public interface UserDto {
 
   String getPassword();
 
-  Integer getInviterUserId();
-
   String getInviteCode();
+
 }

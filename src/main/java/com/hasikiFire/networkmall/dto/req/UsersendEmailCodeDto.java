@@ -18,7 +18,7 @@ public class UsersendEmailCodeDto {
 
     @Schema(description = "邮箱", required = true)
     @NotBlank(message = "邮箱不能为空！")
-    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@(.+).com$", message = "邮箱格式不正确！")
+    @Pattern(regexp = "^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$", message = "邮箱格式不正确！")
     private String email;
 
     @Schema(description = "类型：SendCodeTypeEnum", required = true)

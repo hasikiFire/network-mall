@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.User;
-import com.hasikiFire.networkmall.dto.req.UsedEditDto;
+import com.hasikiFire.networkmall.dto.req.UserCreateDto;
+import com.hasikiFire.networkmall.dto.req.UserEditDto;
 import com.hasikiFire.networkmall.dto.req.UserListReqDto;
 import com.hasikiFire.networkmall.dto.resp.UserListRespDto;
 import com.hasikiFire.networkmall.service.UserService;
@@ -19,6 +20,7 @@ import com.hasikiFire.networkmall.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,13 +31,19 @@ public class AdminUserController {
 
   @Operation(summary = "查询用户列表")
   @GetMapping("/getUserList")
-  public RestResp<PageRespDto<UserListRespDto>> getUserList(@RequestParam UserListReqDto params) {
+  public RestResp<PageRespDto<UserListRespDto>> getUserList(@Valid @RequestParam UserListReqDto params) {
     return userService.getUserList(params);
   }
 
-  @Operation(summary = "新增/编辑用户")
+  @Operation(summary = "新增用户")
+  @PostMapping("/createUser")
+  public RestResp<User> createUser(@Valid @RequestBody UserCreateDto user) {
+    return userService.createUser(user);
+  }
+
+  @Operation(summary = "编辑用户")
   @PostMapping("/updateUser")
-  public RestResp<User> updateUser(@RequestBody UsedEditDto user) {
+  public RestResp<User> updateUser(@Valid @RequestBody UserEditDto user) {
     return userService.updateUser(user);
   }
 
