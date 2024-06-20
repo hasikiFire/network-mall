@@ -1,6 +1,17 @@
 package com.hasikiFire.networkmall.service;
 
+import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
+import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.PackagePurchaseRecord;
+import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
+import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
+import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
+import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
+import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
+import com.hasikiFire.networkmall.dto.resp.PackageRespDto;
+
+import jakarta.validation.Valid;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -13,4 +24,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PackagePurchaseRecordService extends IService<PackagePurchaseRecord> {
 
+  RestResp<PageRespDto<PackageListRespDto>> recordDetail(@Valid PackageListReqDto params);
+
+  RestResp<PackageRespDto> editRecord(@Valid PackageEditReqDto params);
+
+  RestResp<PackageRespDto> addRecord(@Valid PackageEditReqDto params);
 }
