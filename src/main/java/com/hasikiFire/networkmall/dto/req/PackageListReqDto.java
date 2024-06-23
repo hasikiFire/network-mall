@@ -1,5 +1,7 @@
 package com.hasikiFire.networkmall.dto.req;
 
-public class PackageListReqDto {
+import com.hasikiFire.networkmall.core.common.req.PageReqDto;
+
+public class PackageListReqDto extends PageReqDto {
 
 }

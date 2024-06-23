@@ -2,9 +2,7 @@ package com.hasikiFire.networkmall.service;
 
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
-import com.hasikiFire.networkmall.dao.entity.PackagePurchaseRecord;
-import com.hasikiFire.networkmall.dto.req.PackageAddReqDto;
-import com.hasikiFire.networkmall.dto.req.PackageBuyReqDto;
+import com.hasikiFire.networkmall.dao.entity.UsageRecord;
 import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
 import com.hasikiFire.networkmall.dto.req.PackageListReqDto;
 import com.hasikiFire.networkmall.dto.resp.PackageListRespDto;
@@ -20,10 +18,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author ${author}
- * @since 2024/06/03
+ * @since 2024/06/23
  */
-public interface PackagePurchaseRecordService extends IService<PackagePurchaseRecord> {
-
+public interface UsageRecordService extends IService<UsageRecord> {
   RestResp<PageRespDto<PackageListRespDto>> recordDetail(@Valid PackageListReqDto params);
 
   RestResp<PackageRespDto> editRecord(@Valid PackageEditReqDto params);

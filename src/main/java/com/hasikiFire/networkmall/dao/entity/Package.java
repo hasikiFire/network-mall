@@ -40,12 +40,7 @@ public class Package implements Serializable {
     private String packageDesc;
 
     /**
-     * 计费周期，0=每月，1=季度，2=年度
-     */
-    private Integer packageUnit;
-
-    /**
-     *  状态。 0: 未启用 1：活动，2：下架
+     * 状态。 0: 未启用 1：活动，2：下架
      */
     private Integer packageStatus;
 
@@ -104,7 +99,6 @@ public class Package implements Serializable {
      */
     private LocalDateTime updatedAt;
 
-
     public Long getId() {
         return id;
     }
@@ -135,14 +129,6 @@ public class Package implements Serializable {
 
     public void setPackageDesc(String packageDesc) {
         this.packageDesc = packageDesc;
-    }
-
-    public Integer getPackageUnit() {
-        return packageUnit;
-    }
-
-    public void setPackageUnit(Integer packageUnit) {
-        this.packageUnit = packageUnit;
     }
 
     public Integer getPackageStatus() {
@@ -244,23 +230,22 @@ public class Package implements Serializable {
     @Override
     public String toString() {
         return "Package{" +
-        "id=" + id +
-        ", packageId=" + packageId +
-        ", packageName=" + packageName +
-        ", packageDesc=" + packageDesc +
-        ", packageUnit=" + packageUnit +
-        ", packageStatus=" + packageStatus +
-        ", originalPrice=" + originalPrice +
-        ", salePrice=" + salePrice +
-        ", discount=" + discount +
-        ", discountStartDate=" + discountStartDate +
-        ", discountEndDate=" + discountEndDate +
-        ", dataAllowance=" + dataAllowance +
-        ", deviceLimit=" + deviceLimit +
-        ", speedLimit=" + speedLimit +
-        ", deleted=" + deleted +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        "}";
+                "id=" + id +
+                ", packageId=" + packageId +
+                ", packageName=" + packageName +
+                ", packageDesc=" + packageDesc +
+                ", packageStatus=" + packageStatus +
+                ", originalPrice=" + originalPrice +
+                ", salePrice=" + salePrice +
+                ", discount=" + discount +
+                ", discountStartDate=" + discountStartDate +
+                ", discountEndDate=" + discountEndDate +
+                ", dataAllowance=" + dataAllowance +
+                ", deviceLimit=" + deviceLimit +
+                ", speedLimit=" + speedLimit +
+                ", deleted=" + deleted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                "}";
     }
 }

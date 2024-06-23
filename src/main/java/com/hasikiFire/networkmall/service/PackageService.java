@@ -1,5 +1,6 @@
 package com.hasikiFire.networkmall.service;
 
+import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
 import com.hasikiFire.networkmall.dao.entity.Package;
@@ -24,12 +25,14 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PackageService extends IService<Package> {
 
-  RestResp<PageRespDto<PackageListRespDto>> getPackageList(@Valid PackageListReqDto params);
+  RestResp<PageRespDto<PackageListRespDto>> getUserPackageList(PageReqDto params);
 
-  RestResp<PackageRespDto> addPackage(@Valid PackageAddReqDto params);
+  RestResp<PageRespDto<PackageListRespDto>> getPackageAllList(PackageListReqDto params);
 
-  RestResp<PackageRespDto> editPackage(@Valid PackageEditReqDto params);
+  RestResp<PackageRespDto> addPackage(PackageAddReqDto params);
 
-  RestResp<PackageRespDto> purchasePackage(@Valid PackageBuyReqDto params);
+  RestResp<PackageRespDto> editPackage(PackageEditReqDto params);
+
+  RestResp<PackageRespDto> buyPackage(PackageBuyReqDto params);
 
 }

@@ -32,7 +32,6 @@ CREATE TABLE package (
   package_id INT NOT NULL COMMENT '套餐主键',
   package_name VARCHAR(100) NOT NULL COMMENT '套餐名称',
   package_desc VARCHAR(100) COMMENT '套餐描述',
-  package_unit tinyint NOT NULL DEFAULT '0' COMMENT '计费周期，0=每月，1=季度，2=年度',
   original_price decimal(10, 6) NOT NULL COMMENT '商品原价',
   sale_price decimal(10, 6) NOT NULL DEFAULT '0.000000' COMMENT '商品销售价',
   discount DECIMAL(5, 2) COMMENT '折扣百分比',
@@ -135,7 +134,7 @@ CREATE TABLE order_snapshot (
   FOREIGN KEY (order_code) REFERENCES pay_order(order_code)
 ) COMMENT '订单快照表';
 
-CREATE TABLE package_purchase_records (
+CREATE TABLE usage_record (
   `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   purchase_id INT NOT NULL COMMENT '已购套餐ID',
   -- 外键 TODO 需要套餐快照
