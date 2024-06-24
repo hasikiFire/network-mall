@@ -121,7 +121,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
     IPage<PackageItem> pPage = packageMapper.selectPage(page, queryWrapper);
     List<PackageItem> packages = pPage.getRecords();
-    log.info("getUserPackageList pPage: {}", pPage);
+    log.info("getUserPackageList pPage: {}", pPage.getRecords());
     List<PackageListRespDto> packageListRespDtos = packages.stream().map(p -> {
       return PackageListRespDto.builder().id(p.getId()).packageId(p.getPackageId()).packageName(p.getPackageName())
           .packageDesc(p.getPackageDesc()).packageStatus(p.getPackageStatus()).originalPrice(p.getOriginalPrice())
