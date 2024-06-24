@@ -64,7 +64,7 @@ public class AdminController {
 
   // 套餐列表
   @GetMapping("/pacakge/getAlllist")
-  public RestResp<PageRespDto<PackageListRespDto>> listPackages(@Valid @RequestParam PackageListReqDto params) {
+  public RestResp<PageRespDto<PackageListRespDto>> listPackages(@Valid PackageListReqDto params) {
     return packageService.getPackageAllList(params);
   }
 

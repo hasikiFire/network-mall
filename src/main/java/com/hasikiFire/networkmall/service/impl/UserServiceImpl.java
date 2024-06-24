@@ -214,7 +214,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     // queryWrapper.orderByDesc(User::getUpdatedAt);
-    queryWrapper.last("LIMIT " + params.getPageSize());
     // IPage<User> usersPage = userMapper.selectPage(page, queryWrapper);
     // List<User> users = usersPage.getRecords();
     // queryWrapper.orderByDesc(User::getUpdatedAt);

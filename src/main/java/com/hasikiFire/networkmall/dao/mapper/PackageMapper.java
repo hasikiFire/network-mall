@@ -1,6 +1,6 @@
 package com.hasikiFire.networkmall.dao.mapper;
 
-import com.hasikiFire.networkmall.dao.entity.Package;
+import com.hasikiFire.networkmall.dao.entity.PackageItem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author ${author}
  * @since 2024/06/03
  */
-public interface PackageMapper extends BaseMapper<Package> {
+public interface PackageMapper extends BaseMapper<PackageItem> {
 
 }

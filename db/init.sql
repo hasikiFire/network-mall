@@ -27,7 +27,7 @@ CREATE TABLE `roles` (
   `role_name` varchar(16) NOT NULL COMMENT 'admin:管理员，user（普通用户）'
 );
 
-CREATE TABLE package (
+CREATE TABLE package_item (
   `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   package_id INT NOT NULL COMMENT '套餐主键',
   package_name VARCHAR(100) NOT NULL COMMENT '套餐名称',

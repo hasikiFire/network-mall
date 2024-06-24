@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * @author ${author}
  * @since 2024/06/03
  */
-public class Package implements Serializable {
+public class PackageItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
