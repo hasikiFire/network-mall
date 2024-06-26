@@ -1,6 +1,10 @@
 package com.hasikiFire.networkmall.dao.mapper;
 
 import com.hasikiFire.networkmall.dao.entity.PackageItem;
+import com.hasikiFire.networkmall.dto.req.PackageEditReqDto;
+
+import jakarta.validation.Valid;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -14,5 +18,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface PackageMapper extends BaseMapper<PackageItem> {
 
   boolean existsByPackageName(String packageName);
+
+  void updatePackageItem(PackageEditReqDto reqDto);
 
 }

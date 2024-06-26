@@ -60,7 +60,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     List<PackageItem> packages = pPage.getRecords();
     log.info("getUserPackageList pPage: {}", pPage);
     List<PackageListRespDto> packageListRespDtos = packages.stream().map(p -> {
-      return PackageListRespDto.builder().id(p.getId()).packageId(p.getPackageId()).packageName(p.getPackageName())
+      return PackageListRespDto.builder().id(p.getId()).packageName(p.getPackageName())
           .packageDesc(p.getPackageDesc()).packageStatus(p.getPackageStatus()).originalPrice(p.getOriginalPrice())
           .salePrice(p.getSalePrice()).discount(p.getDiscount()).discountStartDate(p.getDiscountStartDate())
           .discountEndDate(p.getDiscountEndDate()).dataAllowance(p.getDataAllowance()).deviceLimit(p.getDeviceLimit())
@@ -116,8 +116,32 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
   @Override
   public RestResp<PackageRespDto> editPackage(@Valid PackageEditReqDto reqDto) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'editPackage'");
+    if (reqDto.getDiscountStartDate() != null) {
+      if (reqDto.getDiscountEndDate() == null) {
+        throw new BusinessException("折扣开始日期不为空时，折扣结束日期不能为空");
+      }
+      if (reqDto.getDiscountStartDate().isAfter(reqDto.getDiscountEndDate())) {
+        throw new BusinessException("折扣开始日期必须在结束日期之前");
+      }
+    }
+
+    // 检查套餐名称是否已存在
+    if (packageMapper.existsByPackageName(reqDto.getPackageName())) {
+      throw new BusinessException("套餐名称已存在");
+    }
+    PackageItem packageItem = packageMapper.selectById(reqDto.getId());
+    log.info("editPackage packageItem: {}", packageItem);
+    if (packageItem == null) {
+      throw new BusinessException("套餐不存在");
+    }
+
+    try {
+      packageMapper.updatePackageItem(reqDto);
+    } catch (Exception e) {
+      // 异常处理
+      throw new BusinessException("编辑套餐失败：" + e.getMessage());
+    }
+    return RestResp.ok(PackageRespDto.builder().item(packageItem).build());
   }
 
   @Override
@@ -135,7 +159,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     LambdaQueryWrapper<PackageItem> queryWrapper = new LambdaQueryWrapper<PackageItem>();
 
     if (reqDto.getPackageId() != null) {
-      queryWrapper.eq(PackageItem::getPackageId, reqDto.getPackageId());
+      queryWrapper.eq(PackageItem::getId, reqDto.getPackageId());
     }
 
     // 根据名字筛选
@@ -159,7 +183,7 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
     List<PackageItem> packages = pPage.getRecords();
     log.info("getUserPackageList pPage: {}", pPage.getRecords());
     List<PackageListRespDto> packageListRespDtos = packages.stream().map(p -> {
-      return PackageListRespDto.builder().id(p.getId()).packageId(p.getPackageId()).packageName(p.getPackageName())
+      return PackageListRespDto.builder().id(p.getId()).packageName(p.getPackageName())
           .packageDesc(p.getPackageDesc()).packageStatus(p.getPackageStatus()).originalPrice(p.getOriginalPrice())
           .salePrice(p.getSalePrice()).discount(p.getDiscount()).discountStartDate(p.getDiscountStartDate())
           .discountEndDate(p.getDiscountEndDate()).dataAllowance(p.getDataAllowance()).deviceLimit(p.getDeviceLimit())
