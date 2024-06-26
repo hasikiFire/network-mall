@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hasikiFire.networkmall.dao.mapper.PackageMapper">
-
+  <select id="existsByPackageName" resultType="boolean"> SELECT COUNT(*) > 0 FROM package_item WHERE
+    package_name = #{packageName} </select>
 </mapper>

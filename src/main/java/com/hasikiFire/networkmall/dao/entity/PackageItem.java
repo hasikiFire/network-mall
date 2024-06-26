@@ -19,15 +19,10 @@ public class PackageItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键
+     * 套餐主键
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
-    /**
-     * 套餐主键
-     */
-    private Integer packageId;
 
     /**
      * 套餐名称
@@ -105,14 +100,6 @@ public class PackageItem implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getPackageId() {
-        return packageId;
-    }
-
-    public void setPackageId(Integer packageId) {
-        this.packageId = packageId;
     }
 
     public String getPackageName() {
@@ -231,7 +218,6 @@ public class PackageItem implements Serializable {
     public String toString() {
         return "Package{" +
                 "id=" + id +
-                ", packageId=" + packageId +
                 ", packageName=" + packageName +
                 ", packageDesc=" + packageDesc +
                 ", packageStatus=" + packageStatus +

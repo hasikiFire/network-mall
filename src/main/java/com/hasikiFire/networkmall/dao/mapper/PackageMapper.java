@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface PackageMapper extends BaseMapper<PackageItem> {
 
+  boolean existsByPackageName(String packageName);
+
 }

@@ -1,5 +1,6 @@
 package com.hasikiFire.networkmall.service.impl;
 
+import com.hasikiFire.networkmall.core.common.exception.BusinessException;
 import com.hasikiFire.networkmall.core.common.req.PageReqDto;
 import com.hasikiFire.networkmall.core.common.resp.PageRespDto;
 import com.hasikiFire.networkmall.core.common.resp.RestResp;
@@ -74,8 +75,43 @@ public class PackageServiceImpl extends ServiceImpl<PackageMapper, PackageItem> 
 
   @Override
   public RestResp<PackageRespDto> addPackage(PackageAddReqDto reqDto) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'addPackage'");
+    if (reqDto.getDiscountStartDate() != null) {
+      if (reqDto.getDiscountEndDate() == null) {
+        throw new BusinessException("折扣开始日期不为空时，折扣结束日期不能为空");
+      }
+      if (reqDto.getDiscountStartDate().isAfter(reqDto.getDiscountEndDate())) {
+        throw new BusinessException("折扣开始日期必须在结束日期之前");
+      }
+    }
+
+    // 检查套餐名称是否已存在
+    if (packageMapper.existsByPackageName(reqDto.getPackageName())) {
+      throw new BusinessException("套餐名称已存在");
+    }
+    PackageItem packageItem = new PackageItem();
+    if (reqDto.getStatus() != null) {
+      packageItem.setPackageStatus(reqDto.getStatus());
+    } else {
+      packageItem.setPackageStatus(0);
+    }
+    try {
+      packageItem.setPackageName(reqDto.getPackageName());
+      packageItem.setPackageDesc(reqDto.getPackageDesc());
+      packageItem.setOriginalPrice(reqDto.getOriginalPrice());
+      packageItem.setSalePrice(reqDto.getSalePrice());
+      packageItem.setDiscount(reqDto.getDiscount());
+      packageItem.setDiscountStartDate(reqDto.getDiscountStartDate());
+      packageItem.setDiscountEndDate(reqDto.getDiscountEndDate());
+      packageItem.setDataAllowance(reqDto.getDataAllowance());
+      packageItem.setDeviceLimit(reqDto.getDeviceLimit());
+      packageItem.setSpeedLimit(reqDto.getSpeedLimit());
+
+      packageMapper.insert(packageItem);
+    } catch (Exception e) {
+      // 异常处理
+      throw new BusinessException("添加套餐失败：" + e.getMessage());
+    }
+    return RestResp.ok(PackageRespDto.builder().item(packageItem).build());
   }
 
   @Override
